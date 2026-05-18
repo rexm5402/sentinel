@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback } from 'react'
 
-const API = 'http://localhost:8000'
+const API = 'https://sentinel-p0py.onrender.com'
 
 // ─── Helpers ─────────────────────────────────────────────────────────────────
 
