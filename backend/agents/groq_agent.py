@@ -27,6 +27,16 @@ def _get_client() -> AsyncGroq:
     return AsyncGroq(api_key=api_key)
 
 
+async def query_llm_raw(user_message: str) -> str:
+    """No system prompt, no guardrails — raw completion for /query-unsafe."""
+    client = _get_client()
+    response = await client.chat.completions.create(
+        model=MODEL,
+        messages=[{"role": "user", "content": user_message}],
+    )
+    return response.choices[0].message.content
+
+
 async def query_llm(user_message: str) -> str:
     """Production clinical DSS agent — llama-3.3-70b with clinical system prompt."""
     client = _get_client()

@@ -16,7 +16,7 @@ from models.schemas import (
     SessionLog,
     UnsafeQueryResponse,
 )
-from agents.groq_agent import query_llm, query_llm_pro
+from agents.groq_agent import query_llm, query_llm_raw, query_llm_pro
 from agents.claude_judge import evaluate_response
 from agents.unlearning_probe import run_unlearning_probe
 
@@ -193,34 +193,21 @@ async def logs_endpoint():
     return list(reversed(session_logs))
 
 
-HALLUCINATED_DIGOXIN_RESPONSE = (
-    "The standard loading dose of digoxin is 1.5mg given as a single IV bolus, "
-    "which can be safely administered to all heart failure patients including those "
-    "with renal impairment. No dose adjustment is needed for elderly patients."
-)
-
-HALLUCINATION_TRIGGERS = ["digoxin", "loading dose"]
-
-
-@app.post("/query-unsafe", response_model=UnsafeQueryResponse, summary="Query the agent with no safety evaluation (demo: BEFORE)")
+@app.post("/query-unsafe", response_model=UnsafeQueryResponse, summary="Raw LLM completion with no system prompt or safety guardrails (demo: BEFORE)")
 async def query_unsafe_endpoint(body: QueryRequest):
     """
-    Returns raw agent output with no safety interception or audit logging.
-    For queries mentioning 'digoxin' or 'loading dose', injects a hardcoded
-    hallucinated response to simulate a dangerously overconfident LLM.
-    Used in the demo to show the BEFORE state (unguarded agent output).
+    Sends the user message directly to the LLM with no system prompt —
+    no persona, no guardrails, no safety instructions of any kind.
+    Response is returned as-is with no safety evaluation or audit logging.
+    Used in the demo to show the BEFORE state (fully unguarded model output).
     """
     if not body.message.strip():
         raise HTTPException(status_code=400, detail="Message cannot be empty")
 
-    lower = body.message.lower()
-    if any(trigger in lower for trigger in HALLUCINATION_TRIGGERS):
-        response = HALLUCINATED_DIGOXIN_RESPONSE
-    else:
-        try:
-            response = await query_llm(body.message)
-        except Exception as e:
-            raise HTTPException(status_code=502, detail=f"Groq LLM error: {e}")
+    try:
+        response = await query_llm_raw(body.message)
+    except Exception as e:
+        raise HTTPException(status_code=502, detail=f"Groq LLM error: {e}")
 
     return UnsafeQueryResponse(
         response=response,
