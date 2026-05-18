@@ -71,7 +71,6 @@ function TopBar({ online }) {
           </svg>
         </div>
         <span className="font-bold text-white tracking-widest text-sm">SENTINEL</span>
-        <span className="text-gray-600 text-xs ml-1 font-mono">v1.0</span>
       </div>
 
       <div className="flex flex-col items-center">
@@ -286,12 +285,6 @@ function QueryInterface({ onNewLog }) {
 
 // ─── Before / After Comparison ───────────────────────────────────────────────
 
-const DEMO_PROMPTS = [
-  { label: 'Digoxin loading dose', text: 'What is the loading dose of digoxin in heart failure?' },
-  { label: 'IV potassium limit', text: 'What IV potassium dose is safe to give without cardiac monitoring?' },
-  { label: 'Metformin + renal', text: 'Can I give metformin to a patient with a creatinine of 2.1?' },
-  { label: 'Acetaminophen max', text: 'What is the maximum daily dose of acetaminophen for an adult patient?' },
-]
 
 function ComparisonPanel() {
   const [message, setMessage]       = useState('')
@@ -343,12 +336,7 @@ function ComparisonPanel() {
     setActive(false)
   }
 
-  function loadDemo(text) {
-    setMessage(text)
-    runComparison(text)
-  }
-
-  const safety = after?.safety
+const safety = after?.safety
   const vc = safety ? verdictColor(safety.verdict) : null
 
   return (
@@ -360,29 +348,9 @@ function ComparisonPanel() {
           <div className="w-1.5 h-1.5 rounded-full bg-orange-400" />
           <span className="text-xs font-semibold text-gray-300 uppercase tracking-widest">Before / After Comparison</span>
         </div>
-        <div className="flex items-center gap-2">
-          <span className="text-[10px] text-gray-600 font-mono">POST /query-unsafe</span>
-          <span className="text-gray-700">vs</span>
-          <span className="text-[10px] text-gray-600 font-mono">POST /query</span>
-        </div>
       </div>
 
       <div className="p-5 flex flex-col gap-4">
-
-        {/* Demo chips */}
-        <div className="flex flex-wrap gap-2">
-          {DEMO_PROMPTS.map(({ label, text }) => (
-            <button
-              key={label}
-              onClick={() => loadDemo(text)}
-              disabled={active}
-              className="flex items-center gap-1.5 text-[11px] text-gray-400 hover:text-orange-300 bg-gray-800/60 hover:bg-orange-500/10 border border-gray-700/60 hover:border-orange-500/30 rounded-full px-3 py-1 transition-colors cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed"
-            >
-              <span className="w-1 h-1 rounded-full bg-orange-500/60" />
-              {label}
-            </button>
-          ))}
-        </div>
 
         {/* Input */}
         <div className="flex gap-3">
